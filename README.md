@@ -156,5 +156,3 @@ hybrid-retrieval-reranker/
 ## Summary
 
 This project demonstrates a practical **hybrid BM25-dense retrieval system with LLM re-ranking** for document search.
-
-The title reflects one target use case, but the architecture itself is generic and can be applied across different retrieval and ranking problems that require both lexical and semantic search.
