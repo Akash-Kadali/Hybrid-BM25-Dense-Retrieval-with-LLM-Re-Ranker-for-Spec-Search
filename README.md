@@ -2,7 +2,6 @@
 
 A hybrid retrieval system that combines **BM25 sparse retrieval**, **dense vector search**, and an **LLM-based re-ranker** to improve search relevance on complex technical document queries.
 
-Although the use case here is construction spec search, the overall retrieval design is generic and can be adapted to any domain that needs both exact keyword matching and semantic retrieval.
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue)
 ![PyTorch](https://img.shields.io/badge/PyTorch-Enabled-red)
