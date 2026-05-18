@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recommendation Engine</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: #2a2a3a;
+    --text: #e4e4ef;
+    --text-dim: #8888a0;
+    --accent: #6c5ce7;
+    --accent-glow: rgba(108, 92, 231, 0.3);
+    --green: #00d2a0;
+    --green-glow: rgba(0, 210, 160, 0.2);
+    --orange: #f0a040;
+    --red: #ff6b6b;
+    --radius: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Ambient glow background */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at 30% 20%, rgba(108, 92, 231, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(0, 210, 160, 0.04) 0%, transparent 50%);
+    z-index: -1;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #e4e4ef 0%, #6c5ce7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .header p {
+    color: var(--text-dim);
+    margin-top: 8px;
+    font-size: 0.95rem;
+  }
+
+  .stats-bar {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 20px;
+    text-align: center;
+  }
+
+  .stat-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 2px;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin-bottom: 24px;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: var(--accent); }
+
+  .card-title {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+
+  /* Upload area */
+  .upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+  }
+
+  .upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--accent);
+    background: rgba(108, 92, 231, 0.05);
+  }
+
+  .upload-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .upload-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+    opacity: 0.6;
+  }
+
+  .upload-zone p { color: var(--text-dim); }
+  .upload-zone .formats { font-size: 0.8rem; margin-top: 8px; color: var(--text-dim); opacity: 0.6; }
+
+  .upload-status {
+    margin-top: 16px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    display: none;
+  }
+
+  .upload-status.success { display: block; background: var(--green-glow); color: var(--green); }
+  .upload-status.error { display: block; background: rgba(255, 107, 107, 0.15); color: var(--red); }
+  .upload-status.loading { display: block; background: var(--accent-glow); color: var(--accent); }
+
+  /* Search */
+  .search-wrap {
+    position: relative;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 16px 20px;
+    padding-right: 120px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .search-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+
+  .search-input::placeholder { color: var(--text-dim); opacity: 0.5; }
+
+  .search-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 10px 24px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .search-btn:hover { filter: brightness(1.15); transform: translateY(-50%) scale(1.02); }
+  .search-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: translateY(-50%); }
+
+  /* Settings row */
+  .settings-row {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .setting {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+  }
+
+  .setting input[type="range"] {
+    width: 100px;
+    accent-color: var(--accent);
+  }
+
+  .setting input[type="number"] {
+    width: 60px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    padding: 4px 8px;
+    font-size: 0.85rem;
+  }
+
+  /* Results */
+  .results-container { margin-top: 8px; }
+
+  .result-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 12px;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .result-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .result-card:hover { border-color: var(--accent); }
+  .result-card:hover::before { opacity: 1; }
+
+  .result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .result-rank {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent);
+  }
+
+  .result-score {
+    font-size: 0.8rem;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+
+  .score-high { background: var(--green-glow); color: var(--green); }
+  .score-med { background: rgba(240, 160, 64, 0.15); color: var(--orange); }
+  .score-low { background: rgba(255, 107, 107, 0.1); color: var(--red); }
+
+  .result-body {
+    display: grid;
+    gap: 6px;
+  }
+
+  .result-field {
+    display: flex;
+    gap: 8px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .field-key {
+    color: var(--text-dim);
+    min-width: 140px;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  .field-value { color: var(--text); }
+
+  .result-meta {
+    margin-top: 10px;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    opacity: 0.6;
+  }
+
+  /* Loading spinner */
+  .spinner {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty-state {
+    text-align: center;
+    padding: 48px;
+    color: var(--text-dim);
+  }
+
+  .empty-state .icon { font-size: 3rem; opacity: 0.3; margin-bottom: 12px; }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    .container { padding: 20px 16px; }
+    .header h1 { font-size: 1.5rem; }
+    .stats-bar { flex-direction: column; gap: 8px; }
+    .settings-row { flex-direction: column; }
+    .field-key { min-width: 100px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>Recommendation Engine</h1>
+    <p>Hybrid BM25 + Semantic Search + Cross-Encoder Re-ranking</p>
+    <div class="stats-bar" id="statsBar">
+      <div class="stat">
+        <div class="stat-value" id="statDocs">0</div>
+        <div class="stat-label">Documents</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="statChunks">0</div>
+        <div class="stat-label">Chunks</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="statDim">-</div>
+        <div class="stat-label">Embed Dim</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="statStatus">--</div>
+        <div class="stat-label">Status</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload -->
+  <div class="card">
+    <div class="card-title">Upload Data</div>
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" id="fileInput" accept=".csv,.xlsx,.xls,.docx,.doc,.pdf" multiple>
+      <div class="upload-icon">+</div>
+      <p>Drop files here or click to upload</p>
+      <div class="formats">CSV, Excel, Word, PDF</div>
+    </div>
+    <div class="upload-status" id="uploadStatus"></div>
+  </div>
+
+  <!-- Search -->
+  <div class="card">
+    <div class="card-title">Search & Recommend</div>
+    <div class="search-wrap">
+      <input type="text" class="search-input" id="searchInput"
+             placeholder="Ask anything about your data..."
+             autocomplete="off">
+      <button class="search-btn" id="searchBtn" onclick="doSearch()">Search</button>
+    </div>
+    <div class="settings-row">
+      <div class="setting">
+        <label>Results:</label>
+        <input type="number" id="topK" value="5" min="1" max="50">
+      </div>
+      <div class="setting">
+        <label>BM25 weight:</label>
+        <input type="range" id="bm25Weight" min="0" max="100" value="40">
+        <span id="bm25Val">0.4</span>
+      </div>
+      <div class="setting">
+        <label>Semantic weight:</label>
+        <input type="range" id="denseWeight" min="0" max="100" value="60">
+        <span id="denseVal">0.6</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div id="resultsArea"></div>
+
+</div>
+
+<script>
+const API = window.location.origin;
+
+// ---- Stats ----
+async function refreshStats() {
+  try {
+    const res = await fetch(`${API}/api/stats`);
+    const data = await res.json();
+    document.getElementById('statDocs').textContent = data.raw_documents;
+    document.getElementById('statChunks').textContent = data.chunks;
+    document.getElementById('statDim').textContent = data.embedding_dim || '-';
+    document.getElementById('statStatus').textContent = data.indexed ? 'Ready' : 'Empty';
+    document.getElementById('statStatus').style.color = data.indexed ? 'var(--green)' : 'var(--text-dim)';
+  } catch(e) {
+    document.getElementById('statStatus').textContent = 'Offline';
+    document.getElementById('statStatus').style.color = 'var(--red)';
+  }
+}
+
+// ---- Upload ----
+const uploadZone = document.getElementById('uploadZone');
+const fileInput = document.getElementById('fileInput');
+const uploadStatus = document.getElementById('uploadStatus');
+
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadZone.classList.remove('dragover');
+  handleFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+
+async function handleFiles(files) {
+  for (const file of files) {
+    uploadStatus.className = 'upload-status loading';
+    uploadStatus.innerHTML = `<span class="spinner"></span> Ingesting ${file.name}...`;
+
+    const form = new FormData();
+    form.append('file', file);
+
+    try {
+      const res = await fetch(`${API}/api/ingest/file`, { method: 'POST', body: form });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.detail || 'Upload failed');
+      }
+      const data = await res.json();
+      uploadStatus.className = 'upload-status success';
+      uploadStatus.textContent = `${file.name} — ${data.chunks_created} chunks created (${data.total_chunks} total)`;
+      refreshStats();
+    } catch(e) {
+      uploadStatus.className = 'upload-status error';
+      uploadStatus.textContent = `Error: ${e.message}`;
+    }
+  }
+  fileInput.value = '';
+}
+
+// ---- Weight sliders (linked) ----
+const bm25Slider = document.getElementById('bm25Weight');
+const denseSlider = document.getElementById('denseWeight');
+
+bm25Slider.addEventListener('input', () => {
+  denseSlider.value = 100 - bm25Slider.value;
+  updateWeightLabels();
+});
+denseSlider.addEventListener('input', () => {
+  bm25Slider.value = 100 - denseSlider.value;
+  updateWeightLabels();
+});
+
+function updateWeightLabels() {
+  document.getElementById('bm25Val').textContent = (bm25Slider.value / 100).toFixed(1);
+  document.getElementById('denseVal').textContent = (denseSlider.value / 100).toFixed(1);
+}
+
+// ---- Search ----
+const searchInput = document.getElementById('searchInput');
+const searchBtn = document.getElementById('searchBtn');
+
+searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+
+async function doSearch() {
+  const query = searchInput.value.trim();
+  if (!query) return;
+
+  searchBtn.disabled = true;
+  searchBtn.innerHTML = '<span class="spinner"></span>';
+  const area = document.getElementById('resultsArea');
+  area.innerHTML = '<div class="empty-state"><span class="spinner" style="width:28px;height:28px;border-width:3px;color:var(--accent)"></span><p style="margin-top:16px">Searching...</p></div>';
+
+  try {
+    const res = await fetch(`${API}/api/recommend`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query,
+        top_k: parseInt(document.getElementById('topK').value) || 5,
+        bm25_weight: bm25Slider.value / 100,
+        dense_weight: denseSlider.value / 100,
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || 'Search failed');
+    }
+
+    const data = await res.json();
+    renderResults(data);
+  } catch(e) {
+    area.innerHTML = `<div class="empty-state" style="color:var(--red)">Error: ${e.message}</div>`;
+  } finally {
+    searchBtn.disabled = false;
+    searchBtn.textContent = 'Search';
+  }
+}
+
+function renderResults(data) {
+  const area = document.getElementById('resultsArea');
+
+  if (!data.results.length) {
+    area.innerHTML = '<div class="empty-state"><div class="icon">:/</div><p>No results found.</p></div>';
+    return;
+  }
+
+  // Determine score range for coloring
+  const scores = data.results.map(r => r.score);
+  const maxScore = Math.max(...scores);
+  const minScore = Math.min(...scores);
+  const range = maxScore - minScore || 1;
+
+  let html = '';
+  for (const r of data.results) {
+    const pct = (r.score - minScore) / range;
+    const scoreClass = pct > 0.6 ? 'score-high' : pct > 0.3 ? 'score-med' : 'score-low';
+
+    // Parse the text (could be key:value pairs or freeform)
+    const lines = r.text.split('\n').filter(l => l.trim());
+    let bodyHtml = '';
+
+    for (const line of lines) {
+      const colonIdx = line.indexOf(':');
+      if (colonIdx > 0 && colonIdx < 40) {
+        const key = line.slice(0, colonIdx).trim();
+        const val = line.slice(colonIdx + 1).trim();
+        bodyHtml += `<div class="result-field"><span class="field-key">${esc(key)}</span><span class="field-value">${esc(val)}</span></div>`;
+      } else {
+        bodyHtml += `<div class="result-field"><span class="field-value">${esc(line)}</span></div>`;
+      }
+    }
+
+    const metaParts = [];
+    if (r.metadata.source) metaParts.push(`Source: ${r.metadata.source.split('/').pop()}`);
+    if (r.metadata.page) metaParts.push(`Page ${r.metadata.page}`);
+    if (r.metadata.row !== undefined) metaParts.push(`Row ${r.metadata.row}`);
+    if (r.metadata.sheet) metaParts.push(`Sheet: ${r.metadata.sheet}`);
+
+    html += `
+      <div class="result-card">
+        <div class="result-header">
+          <span class="result-rank">Rank #${r.rank}</span>
+          <span class="result-score ${scoreClass}">${r.score.toFixed(4)}</span>
+        </div>
+        <div class="result-body">${bodyHtml}</div>
+        ${metaParts.length ? `<div class="result-meta">${esc(metaParts.join(' · '))}</div>` : ''}
+      </div>`;
+  }
+
+  area.innerHTML = html;
+}
+
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// Init
+refreshStats();
+setInterval(refreshStats, 10000);
+</script>
+</body>
+</html>

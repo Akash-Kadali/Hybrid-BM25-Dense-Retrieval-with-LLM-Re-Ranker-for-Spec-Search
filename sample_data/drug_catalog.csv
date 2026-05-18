@@ -1,0 +1,26 @@
+Drug Name,Category,Primary Use,Side Effects,Contraindications,Dosage Form,Avg Cost (30 day)
+Ibuprofen,NSAID,"Pain relief, inflammation, fever","Stomach upset, bleeding risk, kidney issues","Kidney disease, GI bleeding, aspirin allergy","Tablet, Capsule, Liquid",$8
+Acetaminophen,Analgesic,"Pain relief, fever reduction",Liver damage at high doses,"Severe liver disease, alcoholism","Tablet, Liquid, Suppository",$6
+Aspirin,NSAID,"Pain, fever, blood thinning","Stomach bleeding, Reye's syndrome in children","Children under 16, bleeding disorders",Tablet,$5
+Naproxen,NSAID,"Pain, inflammation, arthritis","GI bleeding, cardiovascular risk","GI ulcers, severe kidney/liver disease","Tablet, Liquid",$12
+Metformin,Antidiabetic,Type 2 diabetes blood sugar control,"Nausea, diarrhea, lactic acidosis (rare)","Kidney disease, metabolic acidosis","Tablet, Extended-release",$10
+Lisinopril,ACE Inhibitor,"High blood pressure, heart failure","Dry cough, dizziness, hyperkalemia","Pregnancy, bilateral renal artery stenosis",Tablet,$15
+Atorvastatin,Statin,High cholesterol reduction,"Muscle pain, liver enzyme elevation","Active liver disease, pregnancy",Tablet,$12
+Omeprazole,Proton Pump Inhibitor,"Acid reflux, GERD, stomach ulcers","Headache, diarrhea, vitamin B12 deficiency","None significant, long-term use caution","Capsule, Tablet",$20
+Amoxicillin,Antibiotic,"Bacterial infections (ear, throat, urinary)","Diarrhea, rash, allergic reactions",Penicillin allergy,"Capsule, Liquid",$10
+Azithromycin,Antibiotic,"Respiratory infections, pneumonia, bronchitis","Nausea, diarrhea, abdominal pain","Liver disease, myasthenia gravis","Tablet, Liquid, IV",$15
+Cetirizine,Antihistamine,"Seasonal allergies, hay fever, hives","Drowsiness, dry mouth, headache",None significant,"Tablet, Liquid, Chewable",$10
+Loratadine,Antihistamine,Allergies without drowsiness,"Minimal drowsiness, headache",None significant,"Tablet, Liquid",$12
+Diphenhydramine,Antihistamine,"Allergies, sleep aid, cold symptoms","Strong drowsiness, dry mouth, urinary retention","Glaucoma, urinary retention, MAOIs","Tablet, Liquid, Capsule",$8
+Prednisone,Corticosteroid,"Severe inflammation, autoimmune conditions","Weight gain, bone loss, immune suppression","Active infections, live vaccines","Tablet, Liquid, Injection",$25
+Albuterol,Bronchodilator,"Asthma, bronchospasm relief","Tremor, rapid heartbeat, headache",None significant for acute use,"Inhaler, Nebulizer",$35
+Fluoxetine,SSRI,"Depression, anxiety, OCD, panic disorder","Nausea, insomnia, sexual dysfunction","MAOIs within 14 days, bipolar without mood stabilizer","Capsule, Liquid",$15
+Sertraline,SSRI,"Depression, anxiety, PTSD, OCD","Nausea, diarrhea, insomnia, dizziness","MAOIs, pimozide use","Tablet, Liquid",$12
+Gabapentin,Anticonvulsant,"Nerve pain, seizures, fibromyalgia","Dizziness, drowsiness, weight gain","None significant, dose adjust in renal impairment","Capsule, Tablet",$18
+Tramadol,Opioid Analgesic,Moderate to severe pain,"Nausea, constipation, dependency risk","Seizure disorder, MAOIs","Tablet, Capsule",$20
+Cyclobenzaprine,Muscle Relaxant,"Muscle spasms, back pain","Drowsiness, dry mouth, dizziness","MAOIs, heart failure, hyperthyroidism",Tablet,$10
+Montelukast,Leukotriene Inhibitor,"Asthma prevention, exercise-induced breathing issues","Headache, abdominal pain, mood changes",Phenylketonuria (chewable tablets),"Tablet, Chewable, Granules",$30
+Pantoprazole,Proton Pump Inhibitor,"Acid reflux, GERD, Zollinger-Ellison","Headache, diarrhea, abdominal pain",None significant,"Tablet, IV",$22
+Clopidogrel,Antiplatelet,Prevent blood clots after heart attack/stroke,"Bleeding risk, rash, diarrhea",Active bleeding,Tablet,$15
+Warfarin,Anticoagulant,"Blood clot prevention, atrial fibrillation","Major bleeding risk, requires INR monitoring","Active major bleeding, pregnancy",Tablet,$20
+Insulin Glargine,Insulin,Type 1 and Type 2 diabetes insulin therapy,"Hypoglycemia, weight gain, injection site reactions",None significant,"Injection (pen, vial)",$150
